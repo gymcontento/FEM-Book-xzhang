@@ -24,6 +24,31 @@ def assembly(e, ke):
     """
     model.K[np.ix_(model.LM[:,e], model.LM[:,e])] += ke
 
+# using penalty method to assemble stiffness matrix and force vector
+def penalty_assembly():
+    """
+    Assemble element stiffness matrix and force vector using penalty method.
+    
+    Args:
+        e   : (int) Element number
+        ke  : (numpy(nen*ndof,nen*ndof)) element stiffness matrix 
+    """
+    # penalty method: add a large value to the diagonal of the stiffness matrix
+    # to enforce the essential boundary condition
+    # the positions of the value are positioned at the bottom of the stiffness matrix 
+    penalty = 1e15  # large value for penalty
+    for i in range(model.nd):
+        i = 2*model.nnp - model.nd + i
+        model.K[i, i] += penalty
+        model.f[i] += penalty * model.d[i]  # adjust the force vector accordingly
+    # print("Stiffness matrix K after penalty assembly:\n", model.K)
+    # print("Force vector f after penalty assembly:\n", model.f)
+
+def solvedr_penalty():
+    model.d = np.linalg.solve(model.K, model.f)
+    print('\nsolution d =\n', model.d)
+    return model.d
+
 def solvedr():
     """
     Partition and solve the system of equations
@@ -34,7 +59,7 @@ def solvedr():
     nd = model.nd; neq=model.neq
     K_E = model.K[0:nd, 0:nd]
     K_F = model.K[nd:neq, nd:neq]
-    K_EF =model. K[0:nd, nd:neq]
+    K_EF = model. K[0:nd, nd:neq]
     f_F = model.f[nd:neq]
     d_E = model.d[0:nd]
     

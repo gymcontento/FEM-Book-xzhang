@@ -33,7 +33,7 @@ def TrussElem(e):
         ye = model.y[IENe]
         s = (ye[1] - ye[0])/model.leng[e]
         c = (xe[1] - xe[0])/model.leng[e]
-
+        
         s_s = s*s
         c_c = c*c
         c_s = c*s

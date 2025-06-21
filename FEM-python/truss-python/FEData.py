@@ -35,26 +35,26 @@ Created on Sat May 9 18:34:00 2020
 '''
 
 Title = ""
-nsd   = 0
-ndof  = 0
-nnp   = 0
-nel   = 0
-nen   = 0
-neq   = 0
-nd    = 0
+nsd   = 0 # Number of space dimensions
+ndof  = 0 # Number of degrees-of-freedom per node
+nnp   = 0 # Number of nodal points
+nel   = 0 # Number of elements
+nen   = 0 # Number of element nodes
+neq   = 0 # Number of equations (D.O.F)
+nd    = 0 # Number of nodes on the essential boundary
 
-CArea = np.array([])
-E     = np.array([])
-leng  = np.array([])
-stress= np.array([])
+CArea = np.array([]) # Element values of cross-sectional area
+E     = np.array([]) # Element values of Young's modulus
+leng  = np.array([]) # Element values of length
+stress= np.array([]) # Element values of stress
 
-x     = np.array([])
-y     = np.array([])
-IEN   = np.array([[]])
-LM    = np.array([[]])
-K     = np.array([[]])
-f     = np.array([[]])
-d     = np.array([[]])
+x     = np.array([]) # x coordinates
+y     = np.array([]) # y coordinates
+IEN   = np.array([[]]) # Element connectivity array
+LM    = np.array([[]]) # Location matrix
+K     = np.array([[]]) # Global stiffness matrix
+f     = np.array([[]]) # Global nodal force vector
+d     = np.array([[]]) # Solution vector
 
 plot_truss = False
 plot_node  = False

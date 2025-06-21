@@ -20,7 +20,7 @@ from sys import argv,exit
 import FEData as model
 from TrussElem import TrussElem
 from PrePost import create_model_json, print_stress
-from utitls import assembly, solvedr
+from utitls import assembly, penalty_assembly, solvedr, solvedr_penalty
 
 def FERun(DataFile):
     # create FE model from DataFile in json format
@@ -30,12 +30,14 @@ def FERun(DataFile):
     for e in range(model.nel):
         ke = TrussElem(e)
         assembly(e, ke)
+    penalty_assembly()
     
-    # Partition and solution
-    solvedr()
+    # # Partition and solution
+    # solvedr()
+    solvedr_penalty()
 
-    # Postprocessing
-    print_stress()
+    # # Postprocessing
+    # print_stress()
 
 
 if __name__ == "__main__":

@@ -41,13 +41,15 @@ def create_model_json(DataFile):
     # define the mesh
     model.x = np.array(FEData['x'])
     model.y = np.array(FEData['y'])  
-    model.IEN = np.array(FEData['IEN'], dtype=np.int)
-    model.LM = np.zeros((model.nen*model.ndof, model.nel), dtype=np.int)
+    model.IEN = np.array(FEData['IEN'], dtype=np.int32)
+    # 设置单元节点自由度编号矩阵
+    model.LM = np.zeros((model.nen*model.ndof, model.nel), dtype=np.int32)
     set_LM()
 
     # element and material data (given at the element)
     model.E     = np.array(FEData['E'])
     model.CArea = np.array(FEData['CArea'])
+    # 计算每个单元的长度
     model.leng  = np.sqrt(np.power(model.x[model.IEN[:, 1]-1] - 
                                    model.x[model.IEN[:, 0]-1], 2) +
                           np.power(model.y[model.IEN[:, 1]-1] - 
@@ -57,6 +59,8 @@ def create_model_json(DataFile):
     # prescribed forces
     fdof = FEData['fdof']
     force= FEData['force']
+    # 对f进行初始化
+    # 枚举，ind和value分别为fdof的索引和对应的值，ind为0开始的索引，对应fdof的第一个值
     for ind, value in enumerate(fdof):
         model.f[value-1][0] = force[ind]
 
@@ -66,6 +70,10 @@ def create_model_json(DataFile):
     model.plot_tex  = FEData['plot_tex']
     plottruss()
 
+    # print model parameters
+    # print("Location Matrix:\n", model.LM)
+    # print("Element Lengths:\n", model.leng)
+    # print("Nodal Forces(Initial):\n", model.f)
 
 def set_LM():
     '''

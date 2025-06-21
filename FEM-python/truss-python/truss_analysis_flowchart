@@ -1,0 +1,65 @@
+digraph Truss_Analysis_Flowchart {
+	rankdir=TD
+	A [label="开始"]
+	B [label="Truss.py: 检查命令行参数"]
+	C [label="获取输入数据文件名 .json"]
+	D [label="调用 FERun(DataFile)"]
+	J [label="循环遍历每个单元 e"]
+	M [label="utils.py: solvedr 求解方程组"]
+	P [label="PrePost.py: print_stress"]
+	U [label="结束"]
+	A -> B
+	B -> C
+	C -> D
+	D -> J
+	J -> M
+	M -> P
+	P -> U
+	subgraph cluster_pre {
+		color=blue label="前处理 Pre-Processing" style=rounded
+		E [label="PrePost.py: create_model_json"]
+		F [label="读取 JSON 文件"]
+		G [label="初始化全局变量 nnp, nel, E..."]
+		H [label="PrePost.py: set_LM 设置位置矩阵"]
+		I [label="PrePost.py: plottruss 绘制桁架图 (如果需要)"]
+		D -> E
+		E -> F
+		F -> G
+		G -> H
+		H -> I
+		I -> J
+	}
+	subgraph cluster_assembly {
+		color=green label="计算与组装 Assembly" style=rounded
+		K [label="TrussElem.py: TrussElem(e)
+计算单元刚度矩阵 ke"]
+		L [label="utils.py: assembly(e, ke)
+组装到全局刚度矩阵 K"]
+		J -> K
+		K -> L
+		L -> J [label="为每个单元" style=dashed]
+	}
+	subgraph cluster_solution {
+		color=red label="求解 Solution" style=rounded
+		N [label="划分矩阵 K, d, f"]
+		O [label="求解未知节点位移 d"]
+		P_ [label="计算支座反力 f_E"]
+		M -> N
+		N -> O
+		O -> P_
+		P_ -> P [style=invis]
+	}
+	subgraph cluster_post {
+		color=purple label="后处理 Post-Processing" style=rounded
+		Q [label="PrePost.py: print_stress"]
+		R [label="循环遍历每个单元 e"]
+		S [label="根据位移 d 计算单元应力"]
+		T [label="打印单元应力"]
+		Q -> R
+		R -> S
+		S -> T
+		T -> R [label="为每个单元" style=dashed]
+		R -> U [label="循环结束"]
+	}
+	I -> J [constraint=false]
+}
