@@ -39,9 +39,9 @@ def FERun(DataFile):
     penalty_solvedr()
 
     # # Postprocessing
-    # print_stress()
+    print_stress()
 
-    # plottruss()
+    plottruss()
 
 
 if __name__ == "__main__":

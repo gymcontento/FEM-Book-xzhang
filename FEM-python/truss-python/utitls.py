@@ -55,6 +55,9 @@ def penalty_solvedr():
 
     # calculate the reaction force vector
     f_R = -penalty * d_P[nd_start:nd_end]
+
+    # print the results
+    print('\nDisplacement vector d_P =\n', d_P)
     print('\nReaction force vector f_R =\n', f_R)
 
     model.d = d_P  # update the global displacement vector

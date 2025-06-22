@@ -13,6 +13,7 @@ import FEData as model
 import numpy as np
 import json
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def create_model_json(DataFile):
@@ -137,8 +138,57 @@ def plottruss():
 
         elif model.ndof == 3:
             # insert your code here for 3D
-            # ...
-            pass # delete or comment this line after your implementation for 3D
+            for i in range(model.nel):
+                XX = np.array([model.x[model.IEN[i, 0]-1], 
+                               model.x[model.IEN[i, 1]-1]])
+                YY = np.array([model.y[model.IEN[i, 0]-1], 
+                               model.y[model.IEN[i, 1]-1]])
+                ZZ = np.array([model.z[model.IEN[i, 0]-1], 
+                               model.z[model.IEN[i, 1]-1]])
+                
+                # Create a 3D plot if it doesn't exist
+                # make sure printing in one figure
+                if not plt.get_fignums():
+                    fig = plt.figure()
+                    ax = fig.add_subplot(111, projection='3d')
+                else:
+                    ax = plt.gca()
+
+                ax.plot(XX, YY, ZZ, color="blue")
+
+                # Set equal aspect ratio
+                ax.set_box_aspect([1, 1, 1])
+                ax.set_xlabel(r"$x$")
+                ax.set_ylabel(r"$y$")
+                ax.set_zlabel(r"$z$")
+
+                # Add displacement vectors
+                d_x_index1 = 3*model.IEN[i, 0] - 3
+                d_x_index2 = 3*model.IEN[i, 1] - 3
+                d_x = 10000 * np.array([model.d[d_x_index1], 
+                               model.d[d_x_index2]])
+                d_y_index1 = 3*model.IEN[i, 0] - 2
+                d_y_index2 = 3*model.IEN[i, 1] - 2
+                d_y = 10000 * np.array([model.d[d_y_index1], 
+                                model.d[d_y_index2]])
+                d_z_index1 = 3*model.IEN[i, 0] - 1
+                d_z_index2 = 3*model.IEN[i, 1] - 1
+                d_z = 10000 * np.array([model.d[d_z_index1], 
+                                model.d[d_z_index2]])
+                
+                XX_d = np.array([model.x[model.IEN[i, 0]-1] + d_x[0], 
+                               model.x[model.IEN[i, 1]-1] + d_x[1]])
+                YY_d = np.array([model.y[model.IEN[i, 0]-1] + d_y[0], 
+                               model.y[model.IEN[i, 1]-1] + d_y[1]])
+                ZZ_d = np.array([model.z[model.IEN[i, 0]-1] + d_z[0], 
+                               model.z[model.IEN[i, 1]-1] + d_z[1]])
+
+                ax.plot(XX_d, YY_d, ZZ_d, "red")
+
+                if model.plot_node == "yes":
+                    ax.text(XX[0], YY[0], ZZ[0], str(model.IEN[i, 0]))
+                    ax.text(XX[1], YY[1], ZZ[1], str(model.IEN[i, 1]))
+
         else:
             raise ValueError("The dimension (ndof = {0}) given for the \
                              plottruss is invalid".format(model.ndof))
@@ -185,7 +235,22 @@ def print_stress():
             model.stress[e] = const*(np.array([-c, -s, c, s])@de)
         elif model.ndof == 3:
             # insert your code here for 3D
-            # ...
+            IENe = model.IEN[e] - 1
+            xe = model.x[IENe]
+            ye = model.y[IENe]
+            ze = model.z[IENe]
+            s = (ye[1] - ye[0])/model.leng[e]
+            c = (xe[1] - xe[0])/model.leng[e]
+            c_phi = (ze[1] - ze[0])/model.leng[e]
+            s_phi = np.sqrt(1 - c_phi*c_phi)
+
+            coe_1 = c*s_phi
+            coe_2 = s*s_phi
+            coe_3 = c_phi
+
+            model.stress[e] = const * (np.array([-coe_1, -coe_2, -coe_3, 
+                                                coe_1, coe_2, coe_3]) @ de)
+
             pass # delete or comment this line after your implementation for 3D
         else:
             raise ValueError("The dimension (ndof = {0}) given for the \
