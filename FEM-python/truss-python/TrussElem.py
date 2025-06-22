@@ -43,8 +43,27 @@ def TrussElem(e):
                              [-c_c, -c_s, c_c, c_s],
                              [-c_s, -s_s, c_s, s_s]])
     elif model.ndof == 3:
-        # insert your code here for 3D
-        # ...
+        IENe = model.IEN[e] - 1
+        xe = model.x[IENe]
+        ye = model.y[IENe]
+        ze = model.z[IENe]
+        s = (ye[1] - ye[0])/model.leng[e]
+        c = (xe[1] - xe[0])/model.leng[e]
+        c_phi = (ze[1] - ze[0])/model.leng[e]
+        s_phi = np.sqrt(1 - c_phi*c_phi)
+
+        # calculate coefficients for the transformation matrix
+        coe_1 = c*s_phi
+        coe_2 = s*s_phi
+        coe_3 = c_phi
+
+        # transformation matrix
+        T = np.array([[coe_1, coe_2, coe_3, 0, 0, 0],[0, 0, 0, coe_1, coe_2, coe_3]])
+        T_transpose = T.T
+        
+        # calculate element stiffness matrix
+        ke = const * T_transpose @ [[1, -1], [-1, 1]] @ T
+
         pass # delete or comment this line after your implementation for 3D
     else:
         raise ValueError("The dimension (ndof = {0}) given for the problem \

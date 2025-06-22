@@ -50,6 +50,7 @@ stress= np.array([]) # Element values of stress
 
 x     = np.array([]) # x coordinates
 y     = np.array([]) # y coordinates
+z     = np.array([]) # z coordinates (for 3D problems, otherwise empty)
 IEN   = np.array([[]]) # Element connectivity array
 LM    = np.array([[]]) # Location matrix
 K     = np.array([[]]) # Global stiffness matrix

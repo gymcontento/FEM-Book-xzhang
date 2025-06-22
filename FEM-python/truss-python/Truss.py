@@ -19,8 +19,8 @@ Created on Sat May 9 18:34:00 2020
 from sys import argv,exit
 import FEData as model
 from TrussElem import TrussElem
-from PrePost import create_model_json, print_stress
-from utitls import assembly, penalty_assembly, solvedr, solvedr_penalty
+from PrePost import create_model_json, print_stress, plottruss
+from utitls import assembly, penalty_solvedr, solvedr
 
 def FERun(DataFile):
     # create FE model from DataFile in json format
@@ -30,14 +30,18 @@ def FERun(DataFile):
     for e in range(model.nel):
         ke = TrussElem(e)
         assembly(e, ke)
-    penalty_assembly()
-    
-    # # Partition and solution
-    # solvedr()
-    solvedr_penalty()
+    # print("Global stiffness matrix K =\n", model.K)
+
+    # # partiton method
+    # solvedr()  
+
+    # # penalty method
+    penalty_solvedr()
 
     # # Postprocessing
     # print_stress()
+
+    # plottruss()
 
 
 if __name__ == "__main__":

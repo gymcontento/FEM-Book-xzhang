@@ -40,7 +40,9 @@ def create_model_json(DataFile):
 
     # define the mesh
     model.x = np.array(FEData['x'])
-    model.y = np.array(FEData['y'])  
+    model.y = np.array(FEData['y'])
+    if model.nsd == 3:
+        model.z = np.array(FEData['z'])  
     model.IEN = np.array(FEData['IEN'], dtype=np.int32)
     # 设置单元节点自由度编号矩阵
     model.LM = np.zeros((model.nen*model.ndof, model.nel), dtype=np.int32)
@@ -50,10 +52,18 @@ def create_model_json(DataFile):
     model.E     = np.array(FEData['E'])
     model.CArea = np.array(FEData['CArea'])
     # 计算每个单元的长度
-    model.leng  = np.sqrt(np.power(model.x[model.IEN[:, 1]-1] - 
+    if model.nsd == 2:
+        model.leng  = np.sqrt(np.power(model.x[model.IEN[:, 1]-1] - 
+                                    model.x[model.IEN[:, 0]-1], 2) +
+                            np.power(model.y[model.IEN[:, 1]-1] - 
+                                    model.y[model.IEN[:, 0]-1], 2))
+    if model.nsd == 3:
+        model.leng  = np.sqrt(np.power(model.x[model.IEN[:, 1]-1] - 
                                    model.x[model.IEN[:, 0]-1], 2) +
                           np.power(model.y[model.IEN[:, 1]-1] - 
-                                   model.y[model.IEN[:, 0]-1], 2))
+                                   model.y[model.IEN[:, 0]-1], 2) +
+                          np.power(model.z[model.IEN[:, 1]-1] - 
+                                   model.z[model.IEN[:, 0]-1], 2))
     model.stress= np.zeros((model.nel,))
 
     # prescribed forces
@@ -85,7 +95,6 @@ def set_LM():
                 ind = j*model.ndof + m
                 model.LM[ind, e] = model.ndof*(model.IEN[e, j] - 1) + m
 
-
 def plottruss():
     '''
     plot the truss
@@ -108,10 +117,24 @@ def plottruss():
                 YY = np.array([model.y[model.IEN[i, 0]-1], 
                                model.y[model.IEN[i, 1]-1]])
                 plt.plot(XX, YY, "blue")
+                d_x_index1 = 2*model.IEN[i, 0] - 2
+                d_x_index2 = 2*model.IEN[i, 1] - 2
+                d_x = 10000 * np.array([model.d[d_x_index1], 
+                               model.d[d_x_index2]])
+                d_y_index1 = 2*model.IEN[i, 0] - 1
+                d_y_index2 = 2*model.IEN[i, 1] - 1
+                d_y = 10000 * np.array([model.d[d_y_index1], 
+                                model.d[d_y_index2]])
+                XX_d = np.array([model.x[model.IEN[i, 0]-1] + d_x[0], 
+                               model.x[model.IEN[i, 1]-1] + d_x[1]])
+                YY_d = np.array([model.y[model.IEN[i, 0]-1] + d_y[0], 
+                               model.y[model.IEN[i, 1]-1] + d_y[1]])
+                plt.plot(XX_d, YY_d, "red")
 
                 if model.plot_node == "yes":
                     plt.text(XX[0], YY[0], str(model.IEN[i, 0]))
                     plt.text(XX[1], YY[1], str(model.IEN[i, 1]))
+
         elif model.ndof == 3:
             # insert your code here for 3D
             # ...
